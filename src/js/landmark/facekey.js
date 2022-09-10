@@ -96,6 +96,7 @@ function getKeyType(key){
     }
 }
 
+//얼굴 정보는 여기에 담기는 듯
 function face2Info(face){
     let keyInfo = {};
     let headRotate = getHeadRotation(face["head"]);

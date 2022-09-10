@@ -1,6 +1,7 @@
 const TVRMSHBN = THREE.VRMSchema.HumanoidBoneName;
 
 let loader = new THREE.GLTFLoader();
+
 let defaultPose = [
     [TVRMSHBN.LeftUpperArm, [0, 0, 70]],
     [TVRMSHBN.RightUpperArm, [0, 0, -70]],
@@ -10,6 +11,7 @@ let defaultPose = [
     [TVRMSHBN.RightHand, [0, 0, 0]]
 ];
 
+//기본 위치 잡는 함수
 function setDefaultPose(vrm){
     for(let i = 0; i < defaultPose.length; i ++){
         let pose = defaultPose[i];
@@ -19,6 +21,7 @@ function setDefaultPose(vrm){
     }
 }
 
+//기본 손 위치 잡는 함수
 function setDefaultHand(vrm, leftright){
     for(let i = leftright; i < defaultPose.length; i += 2){
         let pose = defaultPose[i];
@@ -28,6 +31,8 @@ function setDefaultHand(vrm, leftright){
     }
 }
 
+
+//VRM 모델을 위치 정보로 변환하는 함수
 function loadVRMModel(url, cb) {
     loader.crossOrigin = 'anonymous';
     loader.load(url,

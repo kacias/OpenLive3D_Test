@@ -304,6 +304,7 @@ function createLayout(){
     console.log("gui layout initialized");
 }
 
+// 카메라 선택
 function createCameraLayout(){
     let videoselect = document.getElementById("videoselect");
     videoselect.innerHTML = "";
@@ -320,6 +321,8 @@ function createCameraLayout(){
     });
 }
 
+
+// 모드 선택
 function createMoodLayout(){
     // reset MoodLayout
     moodbar.innerHTML = "";
@@ -334,7 +337,9 @@ function createMoodLayout(){
     let moods = getAllMoods();
     for(let i = 0; i < moods.length; i ++){
         let mood = moods[i];
-        if(checkVRMMood(mood)){
+        if(checkVRMMood(mood))
+        {
+
             let moodobj = document.createElement('img');
             moodobj.id = "moodobj_" + mood;
             moodobj.src = "asset/mood/" + mood + ".png";
@@ -376,6 +381,7 @@ function clearDebugCvs(){
     }
 }
 
+//디버그 캔퍼스인 듯
 function drawImage(image){
     if(isVisible("dbgbox")){
         // get debug camera canvas
@@ -392,6 +398,7 @@ function drawImage(image){
     }
 }
 
+//랜드마크 그리기
 function drawLandmark(landmark){
     if(isVisible("dbgbox")){
         // get debug camera canvas
@@ -438,6 +445,7 @@ function printLog(keys){
     }
 }
 
+// 렌더러 출력 (화면 반전 기능 포함)
 function drawScene(scene){
     if(getCMV('CAMERA_FLIP') != getCMV('SCENE_FLIP')){
         setCMV('SCENE_FLIP', getCMV('CAMERA_FLIP'));
@@ -457,6 +465,7 @@ function drawMobile(){
     loadbox.innerHTML = "MOBILE NOT SUPPORTED!!";
 }
 
+//로딩 바 처리
 function drawLoading(loadStage){
     let loadbox = document.getElementById('loadinfo');
     loadbox.innerHTML = "";

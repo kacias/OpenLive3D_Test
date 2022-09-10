@@ -1,3 +1,5 @@
+//메인 함수 (여기서 캐릭터 본의 위치를 업데이트함)
+
 // global scene, light, and clock variable
 let scene = new THREE.Scene();
 let light = new THREE.DirectionalLight(0xffffff);
@@ -13,10 +15,12 @@ let cm = getCM(); // required for ConfigManager Setup
 let currentVrm = undefined;
 let defaultXYZ = undefined;
 
-// initialize / reinitialize VRM
-function loadVRM(vrmurl){
+// initialize / reinitialize VRM (초기화 단계에서 캐릭터 읽어들이는 함수)
+function loadVRM(vrmurl)
+{
     loadVRMModel(vrmurl,
         function(vrm){
+
             if(currentVrm){
                 scene.remove(currentVrm.scene);
                 currentVrm.dispose();
@@ -41,6 +45,8 @@ function loadVRM(vrmurl){
     setMood(getCMV('DEFAULT_MOOD'));
 }
 
+//========================================================
+// 초기화 함수
 // initialize the control
 function initialize(){
 
@@ -102,6 +108,7 @@ function updateMouthEyes(keys){
         }else{
             Cbsp.setValue(Tvrmsbspn.BlinkL, 0);
         }
+
         // irises
         let irispos = keys['irisPos'];
         let irisY = (irispos - getCMV('IRIS_POS_OFFSET')) * getCMV('IRIS_POS_RATIO');
@@ -143,31 +150,39 @@ function updateMouthEyes(keys){
     }
 }
 
+//몸 위치 업데이트
 function updateBody(keys){
     let updateTime = new Date().getTime();
     if(currentVrm){
         let Ch = currentVrm.humanoid;
         let tiltRatio = Math.min(0.2, Math.max(-0.2, keys['tilt']));
         let leanRatio = Math.min(1, Math.max(-1, keys['lean'])) * 0.6;
+
         // head
         let head = Ch.getBoneNode(Tvrmshbn.Head).rotation;
         head.set(radLimit(keys['pitch'] * getCMV('HEAD_RATIO')),
             radLimit(keys['yaw'] * getCMV('HEAD_RATIO') - leanRatio * 0.3),
             radLimit(keys['roll'] * getCMV('HEAD_RATIO') - tiltRatio * 0.3));
+
         // neck
         let neck = Ch.getBoneNode(Tvrmshbn.Neck).rotation;
         neck.set(radLimit(keys['pitch'] * getCMV('NECK_RATIO')),
             radLimit(keys['yaw'] * getCMV('NECK_RATIO') - leanRatio * 0.7),
             radLimit(keys['roll'] * getCMV('NECK_RATIO') - tiltRatio * 0.7));
+
         // chest
         let chest = Ch.getBoneNode(Tvrmshbn.Spine).rotation;
         chest.set(radLimit(keys['pitch'] * getCMV('CHEST_RATIO')),
             radLimit(keys['yaw'] * getCMV('CHEST_RATIO') + leanRatio),
             radLimit(keys['roll'] * getCMV('CHEST_RATIO') + tiltRatio));
+
         // left right arm
-        if(getCMV('HAND_TRACKING')){
-            for(let i = 0; i < 2; i ++){
-                if(updateTime - handTrackers[i] < 1000 * getCMV('HAND_CHECK')){
+        if(getCMV('HAND_TRACKING'))
+        {
+            for(let i = 0; i < 2; i ++)
+            {
+                if(updateTime - handTrackers[i] < 1000 * getCMV('HAND_CHECK'))
+                {
                     let prefix = ["left", "right"][i];
                     // upperArm, lowerArm
                     let wx = keys[prefix + "WristX"];
@@ -189,7 +204,7 @@ function updateBody(keys){
         }
     }
 }
-
+//위치 업데이트 기능
 function updatePosition(keys){
     if(currentVrm && defaultXYZ){
         let Ch = currentVrm.humanoid;
@@ -199,7 +214,7 @@ function updatePosition(keys){
         hips.z = defaultXYZ[2] + keys['z'] * getCMV("POSITION_Z_RATIO");
     }
 }
-
+// 숨쉬는 기능
 function updateBreath(){
     if(currentVrm){
         let Ch = currentVrm.humanoid;
@@ -213,7 +228,7 @@ function updateBreath(){
         hips.y += bos;
     }
 }
-
+//무드 기능
 function updateMood(){
     if(mood != oldmood){
         console.log(mood, oldmood);
@@ -375,7 +390,9 @@ function noHandLandmarkResult(leftright){
 let firstTime = true;
 let tween = null;
 let tmpInfo = getDefaultInfo();
-async function onHolisticResults(results){
+
+async function onHolisticResults(results)
+{
     let updateTime = new Date().getTime();
     if(firstTime){
         hideLoadbox();
@@ -389,33 +406,39 @@ async function onHolisticResults(results){
         drawImage(getCameraFrame());   //카메라에서 frame을 가져와서 그림을 그린다.
     }
 
+
+    //얼굴 표정 탐지
     let PoI = {};
     let allInfo = {};
     if(results.faceLandmarks){
         let keyPoints = packFaceHolistic(results.faceLandmarks);
         mergePoints(PoI, keyPoints);
         let faceInfo = face2Info(keyPoints);
-        allInfo["face"] = faceInfo;
+        allInfo["face"] = faceInfo;  //모든 정보 여기에 담음
         onFaceLandmarkResult(keyPoints, faceInfo);
     }
 
+    //포즈 탐지
     if(results.poseLandmarks){
         let keyPoints = packPoseHolistic(results.poseLandmarks);
         mergePoints(PoI, keyPoints);
         let poseInfo = pose2Info(keyPoints);
-        allInfo["pose"] = poseInfo;
+        allInfo["pose"] = poseInfo;  //모든 정보 여기에 담음
         onPoseLandmarkResult(keyPoints, poseInfo);
     }
 
+    //왼쪽 손 탐지
     if(results.leftHandLandmarks){
         let keyPoints = packHandHolistic(results.leftHandLandmarks, 0);
         mergePoints(PoI, keyPoints);
         let handInfo = hand2Info(keyPoints, 0);
-        allInfo["left_hand"] = handInfo;
+        allInfo["left_hand"] = handInfo; //모든 정보 여기에 담음
         onHandLandmarkResult(keyPoints, handInfo, 0);
     }else if(updateTime - handTrackers[0] > 1000 * getCMV('HAND_CHECK')){
         noHandLandmarkResult(0);
     }
+
+    //오른쪽 손 탐지
     if(results.rightHandLandmarks){
         let keyPoints = packHandHolistic(results.rightHandLandmarks, 1);
         mergePoints(PoI, keyPoints);
@@ -440,6 +463,7 @@ async function onHolisticResults(results){
 }
 
 // the main ML loop
+// 홀리스틕 모델 수행 코드
 let mlLoopCounter = 0;
 async function mlLoop(){
     let hModel = getHolisticModel();
@@ -454,6 +478,7 @@ async function mlLoop(){
 }
 
 // the main visualization loop
+// 메인 그리기 함수
 let viLoopCounter = 0;
 async function viLoop(){
     let minVIDura = getCMV("MIN_VI_DURATION");
@@ -461,11 +486,17 @@ async function viLoop(){
     if(currentVrm && checkImage()){
         viLoopCounter += 1;
         currentVrm.update(clock.getDelta());
+
+        //핵심 업데이트 함수
         updateInfo();
+
+        //단순 렌더러
         drawScene(scene);
+
         setTimeout(function(){
             requestAnimationFrame(viLoop);
         }, minVIDura);
+
     }else{
         setTimeout(function(){
             requestAnimationFrame(viLoop);
