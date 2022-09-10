@@ -2,8 +2,10 @@
 const DEV_DATE = "2022-08-25";
 const VERSION = "Alpha.0.6.2";
 
+//설정파일 전역 변수로 설정
 let configManager = {};
 
+//컨피그 매니져 불러오기 함수
 function getCM(){
     if(Object.keys(configManager).length === 0){
         initCM();
@@ -11,23 +13,30 @@ function getCM(){
     return configManager;
 }
 
+//현재의 컴피그 메이저 쿠기에 저장
 function saveCM(){
     document.cookie = JSON.stringify(configManager);
 }
 
+//컨피그 파일 불러오기
 function loadCM(){
     if(document.cookie){
+
         let cuti = document.cookie.indexOf("{");
+
         if(cuti == -1){
             return false;
         }else{
+
             let cookie = document.cookie.substring(cuti);
             try{
                 configManager = JSON.parse(cookie);
+
                 if(VERSION != configManager['VERSION']){
                     return false;
                 }
                 let checkModifiers = getConfigModifiers();
+
                 for(let key in checkModifiers){
                     let cmk = checkModifiers[key];
                     for(let i = 0; i < cmk.length; i ++){
@@ -36,10 +45,13 @@ function loadCM(){
                         }
                     }
                 }
+
                 return true;
             }catch(e){
+                console.log("==========================================")
                 console.log(cookie);
                 return false;
+
             }
         }
     }else{
@@ -142,10 +154,12 @@ function getSR(key){
     }
 }
 
+//키값을 주면 밸류를 리턴해 주는 함수
 function getCMV(key){
     return configManager[key];
 }
 
+//키 값에 밸류값을 저장하는 함수
 function setCMV(key, value){
     if(key in configManager){
         configManager[key] = value;

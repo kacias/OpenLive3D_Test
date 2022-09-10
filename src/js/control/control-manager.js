@@ -45,6 +45,7 @@ function loadVRM(vrmurl){
 function initialize(){
 
     // html canvas for drawing debug view
+    // UI gui-laytout.js 함수 실행
     createLayout();
 
     // start video
@@ -385,7 +386,7 @@ async function onHolisticResults(results){
 
     clearDebugCvs();
     if(getCMV('DEBUG_IMAGE')){
-        drawImage(getCameraFrame());
+        drawImage(getCameraFrame());   //카메라에서 frame을 가져와서 그림을 그린다.
     }
 
     let PoI = {};

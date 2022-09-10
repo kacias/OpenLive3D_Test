@@ -40,7 +40,9 @@ function sumInfoDiff(o1, o2){
 }
 
 function pushInfo(newinfo){
+
     let motionBlurFactor = getCMV("MOTION_BLUR_RATIO");
+
     if(newinfo){
         if(arrTimeInfo.length >= 2){
             let t0 = arrTimeInfo[0]["time"];
@@ -73,6 +75,8 @@ function pushInfo(newinfo){
 }
 
 let interCheck = {};
+
+
 function addIC(t){
     if(t in interCheck){
         interCheck[t] += 1;
@@ -80,12 +84,15 @@ function addIC(t){
         interCheck[t] = 1;
     }
 }
+
 function getInfo(){
+
     let momentumFactor = getCMV("MOMENTUM_RATIO");
     let lasTime = curTimeInfo["time"];
     let lasInfo = curTimeInfo["info"];
     let curTime = new Date().getTime();
     let difTime = curTime - lasTime;
+
     if(arrTimeInfo.length == 1){
         curTimeInfo = arrTimeInfo[0];
         addIC("l1");

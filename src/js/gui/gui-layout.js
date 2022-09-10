@@ -1,8 +1,10 @@
 // layout
 let sidebar = document.getElementById("thesidebar");
 let moodbar = document.getElementById("themoodbar");
-let layout = document.getElementById("layout");
+let layout = document.getElementById("layout");       //이건 사용 안하는 듯
 let system = document.getElementById("system");
+
+// 시스템 클릭 시 콜백 함수1
 system.onclick = function(){
     console.log("click SYSTEM_IMG");
     if(sidebar.style.display == "none"){
@@ -13,16 +15,25 @@ system.onclick = function(){
         moodbar.style.display = "block";
     }
 };
+
+// 시스템 메시지
 let systemtext = document.getElementById("systemtext");
+
+// 시스템 클릭 시 콜백 함수2
 system.onmouseover = function(){
     systemtext.style.color = "#FFFFFFFF";
 };
+
+// 시스템 클릭 시 콜백 함수3
 system.onmouseout = function(){
     if(sidebar.style.display == "none"){
         systemtext.style.color = "#FFFFFF00";
     }
 };
 
+//=================================================================================================
+
+// Three.js 시작
 // 3D renderer
 let renderer = new THREE.WebGLRenderer({canvas: canvas, alpha: true});
 renderer.setSize(window.innerWidth, window.innerHeight);
@@ -38,6 +49,7 @@ controls.screenSpacePanning = true;
 controls.target.set(0.0, 1.4, 0.0);
 controls.update();
 
+// 윈도우 화면 리사이즈 콜백 함수
 window.addEventListener('resize', onWindowResize, false);
 function onWindowResize(){
     camera.aspect = window.innerWidth / window.innerHeight;
@@ -45,11 +57,13 @@ function onWindowResize(){
     renderer.setSize(window.innerWidth, window.innerHeight);
 }
 
+// 카메라 리셋 함수
 function resetCameraPos(pos){
     camera.position.set(pos.x, pos.y, pos.z - 1.4);
     controls.target.set(pos.x, pos.y, pos.z);
 }
 
+// 백그라운드 색 셋업
 function setBackGround(){
     if(getCMV('BG_UPLOAD')){
         renderer.setClearColor('#000', 0);
@@ -59,6 +73,7 @@ function setBackGround(){
     }
 }
 
+// 카메라 콜백 함수
 function setCameraCallBack(){
     let dbg = document.getElementById("dbg");
     linkCamera2Context(dbg, getCMV('CANVAS_RATIO'));
@@ -66,6 +81,7 @@ function setCameraCallBack(){
     reSettingDone();
 }
 
+// UI 만들기 메인 함수
 function createLayout(){
     setBackGround();
 
@@ -79,8 +95,10 @@ function createLayout(){
         console.log("set camera: ", videoselect.value);
         setVideoStream(videoselect.value, setCameraCallBack);
     }
+
     let dbg = document.getElementById("dbg");
     dbg.style.width = "100%";
+
     let dbgimcheck = document.getElementById("dbgimcheck");
     if(getCMV("DEBUG_IMAGE")){
         dbgimcheck.setAttribute('checked', "checked");
@@ -88,6 +106,7 @@ function createLayout(){
     dbgimcheck.onclick = function myFunction(){
         setCMV("DEBUG_IMAGE", dbgimcheck.checked);
     }
+
     let dbglmcheck = document.getElementById("dbglmcheck");
     if(getCMV("DEBUG_LANDMARK")){
         dbglmcheck.setAttribute('checked', "checked");
@@ -115,7 +134,10 @@ function createLayout(){
     // config modifier
     let confbox = document.getElementById("confbox");
     let confmodifiers = getConfigModifiers();
+
+
     Object.keys(confmodifiers).forEach(function(key){
+
         confmodifier = confmodifiers[key];
         let confkey = document.createElement('div');
         confkey.className = "confkey";
@@ -134,11 +156,15 @@ function createLayout(){
                 }
             });
         }
+
+        //UI 값을 자동으로 읽어들이는 듯
         confbox.appendChild(confkey);
         let confgroup = document.createElement('div');
         confgroup.className = "w3-margin w3-hide";
         confgroup.id = "confgroup_" + key;
         confbox.appendChild(confgroup);
+
+
         for(let i = 0; i < confmodifier.length; i ++){
             let configitem = confmodifier[i];
             let info = document.createElement('text');
