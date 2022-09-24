@@ -248,12 +248,15 @@ function updateMood(){
     }
 }
 
+//여기가 각 파트별로 애니메이션 시키는 곳  
 function updateInfo(){
     let info = getInfo();
     updateBody(info);
     updatePosition(info);
-    updateBreath();
-    updateMood();
+
+    //아래 2개는 옵션 (불활성화 함)
+    //updateBreath();
+    //updateMood();
 }
 
 // Mood

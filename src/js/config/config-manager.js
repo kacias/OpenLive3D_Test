@@ -107,7 +107,7 @@ function initCM(){
     // System Parameters
     configManager['VERSION'] = VERSION;
     configManager['DEV_DATE'] = DEV_DATE;
-    configManager['MODEL'] = 'https://pixiv.github.io/three-vrm/packages/three-vrm/examples/models/three-vrm-girl.vrm';
+    configManager['MODEL'] = 'three-vrm-girl.vrm';
     configManager['ORG_URL'] = "https://github.com/OpenLive3D";
     configManager['REPO_URL'] = "https://github.com/OpenLive3D/OpenLive3D.github.io";
     configManager['DOC_URL'] = "https://github.com/OpenLive3D/OpenLive3D.document";
