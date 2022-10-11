@@ -123,7 +123,7 @@ function initCM(){
     configManager['PREDICT_IRISES'] = true;
     configManager['SCENE_FLIP'] = false;
     configManager['CANVAS_RATIO'] = 0.5;
-    configManager['DEBUG_IMAGE'] = false;
+    configManager['DEBUG_IMAGE'] = true;
     configManager['DEBUG_LANDMARK'] = true;
     configManager['MOOD_ANGRY'] = true;
     configManager['MOOD_SORROW'] = true;

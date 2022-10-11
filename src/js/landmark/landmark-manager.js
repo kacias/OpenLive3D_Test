@@ -25,6 +25,7 @@ const MARKCOLOR = {
     "rightpinky": "#070", // dark-green
 };
 
+//Info 정보 초기값 
 function getDefaultInfo(){
     return {
         "roll": 0, "pitch": 0, "yaw": 0,
@@ -111,6 +112,7 @@ function normalize3d(p1){
     return [p1[0] / d, p1[1] / d, p1[2] / d];
 }
 
+//홀리스틱 모델 생성 (콜백 여러번)
 let hModel = null;
 function loadHolistic(onResults, cb){
     hModel = new Holistic({locateFile: (file) => {
@@ -135,6 +137,7 @@ function loadHolistic(onResults, cb){
     cb();
 }
 
+
 function getHolisticModel(){
     return hModel;
 }
@@ -147,6 +150,7 @@ function checkHModel(){
     }
 }
 
+//단순 복사 함수 
 function mergePoints(PoI, tPoI){
     Object.keys(tPoI).forEach(function(key){
         PoI[key] = tPoI[key];

@@ -12,8 +12,8 @@ clock.start();
 let Tvrmsbspn = THREE.VRMSchema.BlendShapePresetName;
 let Tvrmshbn = THREE.VRMSchema.HumanoidBoneName;
 let cm = getCM(); // required for ConfigManager Setup
-let currentVrm = undefined;
-let defaultXYZ = undefined;
+let currentVrm = undefined; //읽어들인 VRM 모델 
+let defaultXYZ = undefined; //모델 기본 위치   
 
 // initialize / reinitialize VRM (초기화 단계에서 캐릭터 읽어들이는 함수)
 function loadVRM(vrmurl)
@@ -37,6 +37,7 @@ function loadVRM(vrmurl)
             resetCameraPos(pos);
             resetVRMMood();
             createMoodLayout();
+
             let hips = currentVrm.humanoid.getBoneNode(Tvrmshbn.Hips).position;
             defaultXYZ = [hips.x, hips.y, hips.z];
             console.log("vrm model loaded");
@@ -54,10 +55,10 @@ function initialize(){
     // UI gui-laytout.js 함수 실행
     createLayout();
 
-    // start video
+    // start video (카메라를 보여줘야 하므로 있어야 함)
     startCamera(setCameraCallBack);
 
-    // load holistic
+    // load holistic (비동기 함수를 인자로 넘김)
     loadHolistic(onHolisticResults, function(){
         console.log("holistic model connected");
     });
@@ -77,6 +78,7 @@ function ratioLimit(ratio){
     return Math.max(0, Math.min(1, ratio));
 }
 
+//최하위 입/눈 정점 이동 (블랜드 쉐이프로 처리)
 function updateMouthEyes(keys){
     if(currentVrm && mood != Tvrmsbspn.Joy){
         let Cbsp = currentVrm.blendShapeProxy;
@@ -150,7 +152,8 @@ function updateMouthEyes(keys){
     }
 }
 
-//몸 위치 업데이트
+//중요 (여기에 회전 정보 들어 있음. 이걸 오브젝트로 만들어서 전달)
+//몸 위치 업데이트 (본 회전으로 처리)
 function updateBody(keys){
     let updateTime = new Date().getTime();
     if(currentVrm){
@@ -158,21 +161,24 @@ function updateBody(keys){
         let tiltRatio = Math.min(0.2, Math.max(-0.2, keys['tilt']));
         let leanRatio = Math.min(1, Math.max(-1, keys['lean'])) * 0.6;
 
-        // head
+        // head (각도값을 넘기는 곳) (머리)
         let head = Ch.getBoneNode(Tvrmshbn.Head).rotation;
-        head.set(radLimit(keys['pitch'] * getCMV('HEAD_RATIO')),
+        head.set(
+            radLimit(keys['pitch'] * getCMV('HEAD_RATIO')),
             radLimit(keys['yaw'] * getCMV('HEAD_RATIO') - leanRatio * 0.3),
             radLimit(keys['roll'] * getCMV('HEAD_RATIO') - tiltRatio * 0.3));
 
-        // neck
+        // neck (목)
         let neck = Ch.getBoneNode(Tvrmshbn.Neck).rotation;
-        neck.set(radLimit(keys['pitch'] * getCMV('NECK_RATIO')),
+        neck.set(
+            radLimit(keys['pitch'] * getCMV('NECK_RATIO')),
             radLimit(keys['yaw'] * getCMV('NECK_RATIO') - leanRatio * 0.7),
             radLimit(keys['roll'] * getCMV('NECK_RATIO') - tiltRatio * 0.7));
 
-        // chest
+        // chest (가슴)
         let chest = Ch.getBoneNode(Tvrmshbn.Spine).rotation;
-        chest.set(radLimit(keys['pitch'] * getCMV('CHEST_RATIO')),
+        chest.set(
+            radLimit(keys['pitch'] * getCMV('CHEST_RATIO')),
             radLimit(keys['yaw'] * getCMV('CHEST_RATIO') + leanRatio),
             radLimit(keys['roll'] * getCMV('CHEST_RATIO') + tiltRatio));
 
@@ -184,18 +190,30 @@ function updateBody(keys){
                 if(updateTime - handTrackers[i] < 1000 * getCMV('HAND_CHECK'))
                 {
                     let prefix = ["left", "right"][i];
+
                     // upperArm, lowerArm
                     let wx = keys[prefix + "WristX"];
                     let wy = keys[prefix + "WristY"];
                     let hy = keys[prefix + 'Yaw'];
                     let hr = keys[prefix + 'Roll'];
                     let hp = keys[prefix + 'Pitch'];
+
                     let armEuler = armMagicEuler(wx, wy, hy, hr, hp, i);
-                    Object.keys(armEuler).forEach(function(armkey){
+
+                    Object.keys(armEuler).forEach(function(armkey)
+                    {
                         let armobj = Ch.getBoneNode(prefix + armkey).rotation;
+
+                        // console.log("===========================")
+                        // console.log(armobj);
+                        // console.log(armEuler[armkey]);
+
                         armobj.copy(armEuler[armkey]);
+
                     });
+
                 }else{
+
                     setDefaultHand(currentVrm, i);
                 }
             }
@@ -251,6 +269,50 @@ function updateMood(){
 //여기가 각 파트별로 애니메이션 시키는 곳  
 function updateInfo(){
     let info = getInfo();
+
+    //여기에서 값이 넘어가서 각도 계산이 이루어지는 듯
+    //console.log("[info]==========================");
+    //console.log(info);
+
+    /*
+    auto:0.07867722266949648
+    brows: 0.4481873444967822
+    irisPos:-0.017286188168792523
+    lean -0.10606498105550805
+    leftEyeOpen: 0.33287117693903256
+    leftIndex:.9999988866445463
+    leftLittle:0.9999988866445463
+    leftMiddle:0.9999988866445463
+    leftPitch:3.141589155880476
+    leftRing:0.9999988866445463
+    leftRoll:0
+    leftSpread:0
+    leftThumb:0.9999988866445463
+    leftWristX:0.03658981387864098
+    leftWristY:0.05556795043153717
+    leftYaw:0
+    mouth:-0.005261183713858385
+    pitch:-0.17398836204284468
+    rightEyeOpen:0.2653168473598721
+    rightIndex:0.9999988866445463
+    rightLittle:0.9999988866445463
+    rightMiddle:0.9999988866445463
+    rightPitch:3.141589155880476
+    rightRing:0.9999988866445463
+    rightRoll:0
+    rightSpread:0
+    rightThumb: 0.9999988866445463
+    rightWristX:0.09956428100597241
+    rightWristY:0.09760209585839423
+    rightYaw: 0
+    roll:0.06589646336307686
+    tilt:-0.019277885374932798
+    x:-0.11807528550183102
+    y:0.0674567542524225
+    yaw:.00994849653141789
+    z:-0.49493664513577135
+    */
+
     updateBody(info);
     updatePosition(info);
 
@@ -315,7 +377,7 @@ function onPoseLandmarkResult(keyPoints, poseInfo){
             let sr = getSR(getKeyType(key)) / getCMV("SENSITIVITY_SCALE");
             tmpInfo[key] = (1-sr) * poseInfo[key] + sr * tmpInfo[key];
         });
-    }
+    }    
 }
 
 // hand landmark resolver
@@ -326,7 +388,8 @@ let thumbRatios = [40, 60, 20];
 let thumbSwing = 20;
 let handTrackers = [new Date().getTime(), new Date().getTime()];
 
-function onHandLandmarkResult(keyPoints, handInfo, leftright){
+function onHandLandmarkResult(keyPoints, handInfo, leftright)
+{
     let prefix = ["left", "right"][leftright];
     let preRate = 1 - leftright * 2;
     if(handInfo){
@@ -371,6 +434,7 @@ function onHandLandmarkResult(keyPoints, handInfo, leftright){
         });
     }
 }
+
 function noHandLandmarkResult(leftright){
     let prefix = ["left", "right"][leftright];
     let tmpHandInfo = getDefaultHandInto(leftright);
@@ -394,6 +458,7 @@ let firstTime = true;
 let tween = null;
 let tmpInfo = getDefaultInfo();
 
+//비동기 함수 로드되면서 실행 
 async function onHolisticResults(results)
 {
     let updateTime = new Date().getTime();
@@ -405,14 +470,18 @@ async function onHolisticResults(results)
     }
 
     clearDebugCvs();
+
+    //여기를 키면 카메라가 보임 
     if(getCMV('DEBUG_IMAGE')){
         drawImage(getCameraFrame());   //카메라에서 frame을 가져와서 그림을 그린다.
     }
 
 
-    //얼굴 표정 탐지
+    //전역 정보 
     let PoI = {};
     let allInfo = {};
+
+    //얼굴 표정 탐지
     if(results.faceLandmarks){
         let keyPoints = packFaceHolistic(results.faceLandmarks);
         mergePoints(PoI, keyPoints);
@@ -421,16 +490,23 @@ async function onHolisticResults(results)
         onFaceLandmarkResult(keyPoints, faceInfo);
     }
 
-    //포즈 탐지
+    //포즈 생성 (미디어 파이프 점들을 VRM으로)
     if(results.poseLandmarks){
         let keyPoints = packPoseHolistic(results.poseLandmarks);
         mergePoints(PoI, keyPoints);
+        //console.log("[keyPoints]///////////////////");
+        //console.log(keyPoints);
+
         let poseInfo = pose2Info(keyPoints);
         allInfo["pose"] = poseInfo;  //모든 정보 여기에 담음
+
+        //console.log("allInfo[pose]///////////////////");
+        //console.log(allInfo["pose"]);
+
         onPoseLandmarkResult(keyPoints, poseInfo);
     }
 
-    //왼쪽 손 탐지
+    //왼쪽 손 포즈 생성
     if(results.leftHandLandmarks){
         let keyPoints = packHandHolistic(results.leftHandLandmarks, 0);
         mergePoints(PoI, keyPoints);
@@ -441,7 +517,7 @@ async function onHolisticResults(results)
         noHandLandmarkResult(0);
     }
 
-    //오른쪽 손 탐지
+    //오른쪽 손 포즈 생성
     if(results.rightHandLandmarks){
         let keyPoints = packHandHolistic(results.rightHandLandmarks, 1);
         mergePoints(PoI, keyPoints);
@@ -452,7 +528,13 @@ async function onHolisticResults(results)
         noHandLandmarkResult(1);
     }
 
-    printLog(allInfo);
+    //===============================================
+    //여기가 한전 가공된 값이 담긴 곳. 이게 각도일까? 아니네 (All info: 얼굴과 몸의 상위 파라미터만 있음. tile, lean, position 등)
+    //console.log("[allinfo]==========================");
+    //console.log(allInfo);
+    //printLog(allInfo);
+    //===============================================
+
     if(getCMV('DEBUG_LANDMARK')){
         drawLandmark(PoI);
     }
@@ -490,7 +572,7 @@ async function viLoop(){
         viLoopCounter += 1;
         currentVrm.update(clock.getDelta());
 
-        //핵심 업데이트 함수
+        //핵심 업데이트 함수 (캐릭터 머리, 몸의 위치를 업데이트 함)
         updateInfo();
 
         //단순 렌더러
@@ -555,8 +637,10 @@ async function checkIntegrate(){
     let image = getCameraFrame();
     let hModel = getHolisticModel();
     await hModel.send({image: getCameraFrame()});
-    requestAnimationFrame(viLoop);
-    mlLoop();
+    
+    requestAnimationFrame(viLoop);     //캐릭터 본의 위치를 업데이트 함 
+    mlLoop();  //카메라로부터 오는 이미지를 홀리스틱에 넘김 
+    
     console.log("ml & visual loops initialized");
 }
 

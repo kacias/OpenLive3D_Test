@@ -1,3 +1,13 @@
+
+To do list 
+
+1) 캐릭터만 따로 떼어 낸 후 작업 
+2) 홀리스틱만 따로 떼어 낸 후 작업 
+3) 2개의 특징을 파악한 후 합치기 
+
+
+
+
 # OpenLive3D
 
 The open source project for Live3D Virtual Avatar.

@@ -1,8 +1,32 @@
+//여기에 있는 UI중에서 캐릭터랑 카메라 디버그 박스만 빼고 삭제해야 할 듯. 
+
 // layout
 let sidebar = document.getElementById("thesidebar");
 let moodbar = document.getElementById("themoodbar");
 let layout = document.getElementById("layout");       //이건 사용 안하는 듯
 let system = document.getElementById("system");
+
+
+//=================================================================================================
+
+// Three.js 시작
+// 3D renderer
+let renderer = new THREE.WebGLRenderer({canvas: canvas, alpha: true});
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setPixelRatio(window.devicePixelRatio);
+
+// camera
+let camera = new THREE.PerspectiveCamera(30.0, window.innerWidth / window.innerHeight, 0.1, 20.0);
+camera.position.set(0.0, 1.4, -1.4);
+
+// camera controls
+let controls = new THREE.OrbitControls(camera, renderer.domElement);
+controls.screenSpacePanning = true;
+controls.target.set(0.0, 1.4, 0.0);
+controls.update();
+
+// -----------------------------------------
+
 
 // 시스템 클릭 시 콜백 함수1
 system.onclick = function(){
@@ -31,24 +55,6 @@ system.onmouseout = function(){
     }
 };
 
-//=================================================================================================
-
-// Three.js 시작
-// 3D renderer
-let renderer = new THREE.WebGLRenderer({canvas: canvas, alpha: true});
-renderer.setSize(window.innerWidth, window.innerHeight);
-renderer.setPixelRatio(window.devicePixelRatio);
-
-// camera
-let camera = new THREE.PerspectiveCamera(30.0, window.innerWidth / window.innerHeight, 0.1, 20.0);
-camera.position.set(0.0, 1.4, -1.4);
-
-// camera controls
-let controls = new THREE.OrbitControls(camera, renderer.domElement);
-controls.screenSpacePanning = true;
-controls.target.set(0.0, 1.4, 0.0);
-controls.update();
-
 // 윈도우 화면 리사이즈 콜백 함수
 window.addEventListener('resize', onWindowResize, false);
 function onWindowResize(){
@@ -57,13 +63,13 @@ function onWindowResize(){
     renderer.setSize(window.innerWidth, window.innerHeight);
 }
 
-// 카메라 리셋 함수
+// 카메라 리셋 함수 (캐릭터 뒤로 위치) 
 function resetCameraPos(pos){
     camera.position.set(pos.x, pos.y, pos.z - 1.4);
     controls.target.set(pos.x, pos.y, pos.z);
 }
 
-// 백그라운드 색 셋업
+// 백그라운드 색 셋업 이미지가 있으면 그걸 사용
 function setBackGround(){
     if(getCMV('BG_UPLOAD')){
         renderer.setClearColor('#000', 0);
@@ -73,7 +79,7 @@ function setBackGround(){
     }
 }
 
-// 카메라 콜백 함수
+// 카메라 콜백 함수 (콜백은 그냥 맨 마지막에 호출됨)
 function setCameraCallBack(){
     let dbg = document.getElementById("dbg");
     linkCamera2Context(dbg, getCMV('CANVAS_RATIO'));
@@ -381,7 +387,7 @@ function clearDebugCvs(){
     }
 }
 
-//디버그 캔퍼스인 듯
+//디버그 캔퍼스가 카메라가 인것 같은데 
 function drawImage(image){
     if(isVisible("dbgbox")){
         // get debug camera canvas
@@ -393,7 +399,7 @@ function drawImage(image){
         }else{
             dbg.scale(getCMV('CANVAS_RATIO'), getCMV('CANVAS_RATIO'));
         }
-        dbg.drawImage(image, 0, 0); // print the camera
+        dbg.drawImage(image, 0, 0); // print the camera (동일 이름이지만 이건 html쪽 함수)
         dbg.restore();
     }
 }
@@ -423,6 +429,7 @@ function drawLandmark(landmark){
     }
 }
 
+//로그 박스 이네. 
 function printLog(keys){
     if(isVisible("logbox")){
         let logitems = getLogItems();

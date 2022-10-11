@@ -1,3 +1,6 @@
+
+//이것만 읽어들여도 vrm모델이 출력되어야 한다. 
+
 const TVRMSHBN = THREE.VRMSchema.HumanoidBoneName;
 
 let loader = new THREE.GLTFLoader();
@@ -22,8 +25,10 @@ function setDefaultPose(vrm){
 }
 
 //기본 손 위치 잡는 함수
-function setDefaultHand(vrm, leftright){
-    for(let i = leftright; i < defaultPose.length; i += 2){
+function setDefaultHand(vrm, leftright)
+{
+    for(let i = leftright; i < defaultPose.length; i += 2)
+    {
         let pose = defaultPose[i];
         for(let j = 0; j < 3; j ++){
             vrm.humanoid.getBoneNode(pose[0]).rotation["xyz"[j]] = pose[1][j] / 180 * Math.PI;
@@ -33,7 +38,8 @@ function setDefaultHand(vrm, leftright){
 
 
 //VRM 모델을 위치 정보로 변환하는 함수
-function loadVRMModel(url, cb) {
+function loadVRMModel(url, cb) 
+{
     loader.crossOrigin = 'anonymous';
     loader.load(url,
         (gltf) => {

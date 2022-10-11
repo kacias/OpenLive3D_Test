@@ -56,6 +56,7 @@ function pushInfo(newinfo){
                     arrTimeInfo[0]["info"],
                     newinfo, t0diff, t1diff
                 ), 1, motionBlurFactor);
+
             arrTimeInfo = [{
                 "time": t1,
                 "info": smoothInfo
@@ -63,6 +64,7 @@ function pushInfo(newinfo){
                 "time": t2,
                 "info": newinfo
             }];
+            
         }else{
             arrTimeInfo.push({
                 "time": new Date().getTime(),
@@ -85,6 +87,7 @@ function addIC(t){
     }
 }
 
+//여기서 전체 정보를 가져오는 듯.
 function getInfo(){
 
     let momentumFactor = getCMV("MOMENTUM_RATIO");

@@ -2,6 +2,8 @@
 // left right
 // https://google.github.io/mediapipe/solutions/hands.html
 
+
+//미디어 파이프 본 인덱스 사용 
 const HPoI = {
     "paw": [0, 5, 17],
     "thumb": [1, 2, 4],
@@ -11,13 +13,14 @@ const HPoI = {
     "pinky": [17, 18, 20]
 };
 
+//paw를 기준으로 y, z 비율 계산
 function getThumbRatio(hand, prefix){
     let base = hand[prefix + "paw"][2];
     let d1 = distance3d(hand[prefix + "paw"][1], base);
     let d2 = distance3d(hand[prefix + "thumb"][2], base);
     return (d2 - d1) / d1;
 }
-
+//2,5 손가락 길이 기준으로 얼마나 펴져 있는지 보는 듯 
 function getHandSpread(hand, prefix){
     let indexFinger = hand[prefix + "index"];
     let pinkyFinger = hand[prefix + "pinky"];
@@ -26,6 +29,7 @@ function getHandSpread(hand, prefix){
     return (d2 - d1) / d1;
 }
 
+//IMRP 비율이라는 걸 계산 
 function getIMRPRatio(hand, prefix){
     let arr = ["index", "middle", "ring", "pinky"];
     let res = [];
@@ -38,6 +42,7 @@ function getIMRPRatio(hand, prefix){
     return res;
 }
 
+//손 각도 
 function getHandRotation(hand, leftright){
     let prefix = ["left", "right"][leftright];
     let lrRatio = 1 - leftright * 2;

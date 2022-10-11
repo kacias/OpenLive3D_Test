@@ -1,4 +1,4 @@
-//카메라 설정 & 관리
+//카메라 설정 & 관리 (카메라 제어이므로 다 있긴 있어야 할 듯)
 
 let capture = document.createElement("video");
 capture.playsinline = "playsinline";
